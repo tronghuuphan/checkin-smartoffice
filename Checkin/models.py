@@ -46,6 +46,7 @@ class Student(models.Model):
         ClassSH, on_delete=models.SET_NULL, null=True, related_name="classes"
     )
     active_status = models.BooleanField()
+    image = models.CharField(max_length=255, null=True)
 
     def __str__(self):
         return f"{self.name} - {self.CCCD}"
@@ -57,6 +58,7 @@ class Log(models.Model):
     date = models.DateField(auto_now_add=True)
     time = models.TimeField(auto_now_add=True)
     mask = models.BooleanField()
+    image = models.CharField(max_length=255, null=True)
 
 
 class Manager(models.Model):
@@ -69,6 +71,7 @@ class Manager(models.Model):
         null=True,
         blank=True,
     )
+    image = models.CharField(max_length=255, null=True)
 
     def __str__(self):
         return f"{self.user} - {self.phone}"

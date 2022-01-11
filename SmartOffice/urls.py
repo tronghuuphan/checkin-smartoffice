@@ -35,6 +35,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("", include('Checkin.urls')),
     path("__debug__/", include("debug_toolbar.urls")),
     re_path(
         r"^swagger(?P<format>\.json|\.yaml)$",
