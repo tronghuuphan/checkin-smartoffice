@@ -9,9 +9,12 @@ mysqlclient = "*"
 djangorestframework = "*"
 django-debug-toolbar = "*"
 drf-yasg = "*"
+django-filter = "*"
+drf-nested-routers = "*"
 
 [dev-packages]
 black = "*"
+autopep8 = "*"
 
 [requires]
 python_version = "3.8"

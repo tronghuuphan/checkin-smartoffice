@@ -30,7 +30,7 @@ class ClassSH(models.Model):
     location = models.CharField(max_length=255)
 
     def __str__(self):
-        return f"{self.name} - {self.year}"
+        return f"{self.name}"
 
 
 class Student(models.Model):
@@ -48,8 +48,11 @@ class Student(models.Model):
     active_status = models.BooleanField()
     image = models.CharField(max_length=255, null=True)
 
+    class Meta:
+        ordering = ['classSH']
+
     def __str__(self):
-        return f"{self.name} - {self.CCCD}"
+        return f"{self.CCCD}"
 
 
 class Log(models.Model):
@@ -59,6 +62,9 @@ class Log(models.Model):
     time = models.TimeField(auto_now_add=True)
     mask = models.BooleanField()
     image = models.CharField(max_length=255, null=True)
+
+    class Meta:
+        ordering = ['-date', '-time']
 
 
 class Manager(models.Model):
