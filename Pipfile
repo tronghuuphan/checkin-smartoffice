@@ -11,6 +11,8 @@ django-debug-toolbar = "*"
 drf-yasg = "*"
 django-filter = "*"
 drf-nested-routers = "*"
+djoser = "*"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
 black = "*"

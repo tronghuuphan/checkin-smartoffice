@@ -5,6 +5,7 @@ from .models import (
     Student,
     ClassSH,
     Department,
+    Manager,
 )
 
 
@@ -82,3 +83,13 @@ class LogSerializer(SimpleLogSerializer):
 
 class SimpleClassLogSerializer(LogSerializer):
     student = StudentSerializer()
+
+
+class ManagerSerializer(serializers.ModelSerializer):
+    department_id = serializers.IntegerField()
+    user_id = serializers.IntegerField()
+
+    class Meta:
+        model = Manager
+        fields = ('id', 'user_id', 'phone',
+                  'birthday', 'department_id', 'image')

@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework.mixins import (
     ListModelMixin,
     RetrieveModelMixin,
-    CreateModelMixin
+    CreateModelMixin,
+    UpdateModelMixin,
 )
 from rest_framework.viewsets import (
     GenericViewSet,
@@ -15,7 +16,8 @@ from .models import (
     ClassSH,
     Log,
     Student,
-    Department
+    Department, 
+    Manager,
 )
 from .serializers import (
     DetailStudentSerializer,
@@ -27,6 +29,7 @@ from .serializers import (
     DepartmentSerializer,
     CreateStudentSerializer,
     BaseClassSHSerializer,
+    ManagerSerializer,
 )
 from .paginations import LogPagination, StudentPagination
 from .filters import (
@@ -111,3 +114,8 @@ class LogViewSet(ListModelMixin, GenericViewSet):
     search_fields = ['student__first_name', 'student__last_name']
     ordering_fields = ['student__classSH', 'camera',
                        'student__last_name', 'date', 'time']
+
+
+class ManagerViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
+    queryset = Manager.objects.all()
+    serializer_class = ManagerSerializer

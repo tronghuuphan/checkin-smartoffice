@@ -9,6 +9,7 @@ from .views import (
     ClassLogViewSet,
     StudentLogViewSet,
     DepartmentViewSet,
+    ManagerViewSet,
 )
 
 router = DefaultRouter()
@@ -17,6 +18,7 @@ router.register("departments", viewset=DepartmentViewSet,
 router.register("classSH", viewset=ClassSHViewSet, basename="classSH")
 router.register("students", viewset=DetailStudentViewSet, basename="student")
 router.register("logs", viewset=LogViewSet, basename="log")
+router.register("managers", viewset=ManagerViewSet, basename="manager")
 
 classSH = routers.NestedDefaultRouter(
     parent_router=router,
