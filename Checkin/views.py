@@ -1,13 +1,37 @@
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin
-from rest_framework.viewsets import GenericViewSet
+from rest_framework.mixins import (
+    ListModelMixin,
+    RetrieveModelMixin,
+    CreateModelMixin
+)
+from rest_framework.viewsets import (
+    GenericViewSet,
+    ModelViewSet,
+)
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
-from .models import ClassSH, Log, Student, Department
-from .serializers import DetailStudentSerializer, LogSerializer, ClassSHSerializer, SimpleLogSerializer, StudentSerializer, SimpleClassLogSerializer, DepartmentSerializer
+from .models import (
+    ClassSH,
+    Log,
+    Student,
+    Department
+)
+from .serializers import (
+    DetailStudentSerializer,
+    LogSerializer,
+    ClassSHSerializer,
+    SimpleLogSerializer,
+    StudentSerializer,
+    SimpleClassLogSerializer,
+    DepartmentSerializer
+)
 from .paginations import LogPagination, StudentPagination
-from .filters import LogFilter, SimpleLogFilter, ClassSHFilter
+from .filters import (
+    LogFilter,
+    SimpleLogFilter,
+    ClassSHFilter,
+)
 
 
 class DepartmentViewSet(ListModelMixin, GenericViewSet):
@@ -22,15 +46,17 @@ class ClassSHViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     filter_class = ClassSHFilter
 
 
-class StudentViewSet(ListModelMixin, RetrieveModelMixin, CreateModelMixin, GenericViewSet):
+class StudentViewSet(ModelViewSet):
     serializer_class = StudentSerializer
     filter_backends = (SearchFilter,)
     search_fields = ['first_name', 'last_name']
     pagination_class = StudentPagination
 
-
     def get_queryset(self):
         return Student.objects.filter(classSH_id=self.kwargs['classSH_pk'])
+
+    def get_serializer_context(self):
+        return {'classSH_id': self.kwargs['classSH_pk']}
 
 
 class DetailStudentViewSet(RetrieveModelMixin, GenericViewSet):

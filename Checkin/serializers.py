@@ -1,6 +1,11 @@
 from django.db.models import fields
 from rest_framework import serializers
-from .models import Log, Student, ClassSH, Department
+from .models import (
+    Log,
+    Student,
+    ClassSH,
+    Department,
+)
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -29,10 +34,14 @@ class StudentSerializer(serializers.ModelSerializer):
             "birthday",
             "image",
         )
+    
+    def create(self, validated_data):
+        classSH_id = self.context['classSH_id']
+        return Student.objects.create(classSH_id=classSH_id, **validated_data)
 
 
 class DetailStudentSerializer(StudentSerializer):
-    classSH = ClassSHSerializer()
+    classSH = ClassSHSerializer(read_only=True)
 
     class Meta:
         model = StudentSerializer.Meta.model
