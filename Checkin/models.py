@@ -18,7 +18,6 @@ class Department(models.Model):
     def __str__(self):
         return self.name
 
-
 class ClassSH(models.Model):
     name = models.CharField(max_length=255)
     year = models.PositiveIntegerField(

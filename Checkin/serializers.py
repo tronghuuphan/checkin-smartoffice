@@ -14,12 +14,15 @@ class DepartmentSerializer(serializers.ModelSerializer):
         fields = ("id", "name",)
 
 
-class ClassSHSerializer(serializers.ModelSerializer):
-    department = DepartmentSerializer()
-
+class BaseClassSHSerializer(serializers.ModelSerializer):
+    '''Base class for CREATE a new class and base for LIST class'''
     class Meta:
         model = ClassSH
         fields = ("id", "name", "year", "location", "department")
+
+
+class ClassSHSerializer(BaseClassSHSerializer):
+    department = DepartmentSerializer(read_only=True)
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -34,18 +37,33 @@ class StudentSerializer(serializers.ModelSerializer):
             "birthday",
             "image",
         )
-    
+
     def create(self, validated_data):
         classSH_id = self.context['classSH_id']
         return Student.objects.create(classSH_id=classSH_id, **validated_data)
 
 
 class DetailStudentSerializer(StudentSerializer):
-    classSH = ClassSHSerializer(read_only=True)
+    classSH = ClassSHSerializer()
 
     class Meta:
         model = StudentSerializer.Meta.model
         fields = StudentSerializer.Meta.fields + ('classSH',)
+
+
+class CreateStudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = (
+            "CCCD",
+            "first_name",
+            "last_name",
+            "email",
+            "sex",
+            "birthday",
+            "image",
+            "classSH"
+        )
 
 
 class SimpleLogSerializer(serializers.ModelSerializer):
