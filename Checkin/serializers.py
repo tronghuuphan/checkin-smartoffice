@@ -6,7 +6,7 @@ from .models import Log, Student, ClassSH, Department
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
-        fields = ("name",)
+        fields = ("id", "name",)
 
 
 class ClassSHSerializer(serializers.ModelSerializer):

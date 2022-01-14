@@ -1,9 +1,10 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ClassSHViewSet, LogViewSet, DetailStudentViewSet, StudentViewSet, ClassLogViewSet, StudentLogViewSet
+from .views import ClassSHViewSet, LogViewSet, DetailStudentViewSet, StudentViewSet, ClassLogViewSet, StudentLogViewSet, DepartmentViewSet
 from rest_framework_nested import routers
 
 router = DefaultRouter()
+router.register("departments", viewset=DepartmentViewSet, basename="department")
 router.register("classSH", viewset=ClassSHViewSet, basename="classSH")
 router.register("students", viewset=DetailStudentViewSet, basename="student")
 router.register("logs", viewset=LogViewSet, basename="log")

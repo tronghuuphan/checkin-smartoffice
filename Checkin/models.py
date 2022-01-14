@@ -45,7 +45,7 @@ class Student(models.Model):
     classSH = models.ForeignKey(
         ClassSH, on_delete=models.SET_NULL, null=True, related_name="classes"
     )
-    active_status = models.BooleanField()
+    active_status = models.BooleanField(default=True)
     image = models.CharField(max_length=255, null=True)
 
     class Meta:
