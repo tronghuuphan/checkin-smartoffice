@@ -1,5 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.mixins import (
     ListModelMixin,
     RetrieveModelMixin,
@@ -16,7 +18,7 @@ from .models import (
     ClassSH,
     Log,
     Student,
-    Department, 
+    Department,
     Manager,
 )
 from .serializers import (
@@ -30,6 +32,8 @@ from .serializers import (
     CreateStudentSerializer,
     BaseClassSHSerializer,
     ManagerSerializer,
+    HiddenManagerSerializer,
+    ListManagerSerializer
 )
 from .paginations import LogPagination, StudentPagination
 from .filters import (
@@ -37,6 +41,7 @@ from .filters import (
     SimpleLogFilter,
     ClassSHFilter,
 )
+from .permissions import IsAdminOrReadOnly
 
 
 class DepartmentViewSet(ModelViewSet):
@@ -44,6 +49,7 @@ class DepartmentViewSet(ModelViewSet):
     serializer_class = DepartmentSerializer
     filter_backends = (OrderingFilter,)
     ordering_fields = ('name',)
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class ClassSHViewSet(ModelViewSet):
@@ -51,6 +57,7 @@ class ClassSHViewSet(ModelViewSet):
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_class = ClassSHFilter
     ordering_fields = ('name', 'year', 'location', 'department')
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -64,9 +71,12 @@ class StudentViewSet(ModelViewSet):
     search_fields = ['first_name', 'last_name']
     pagination_class = StudentPagination
     ordering = ('last_name',)
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Student.objects.filter(classSH_id=self.kwargs['classSH_pk'])
+        if self.request.user.is_staff:
+            return Student.objects.filter(classSH_id=self.kwargs['classSH_pk'])
+        return Student.objects.filter(classSH_id=self.kwargs['classSH_pk'], classSH__department_id=self.request.user.managers.department_id)
 
     def get_serializer_context(self):
         return {'classSH_id': self.kwargs['classSH_pk']}
@@ -74,6 +84,7 @@ class StudentViewSet(ModelViewSet):
 
 class DetailStudentViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet):
     queryset = Student.objects.all().select_related('classSH', 'classSH__department')
+    permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -88,9 +99,13 @@ class ClassLogViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     pagination_class = LogPagination
     search_fields = ['student__first_name', 'student__last_name']
     ordering_fields = ['camera', 'student__last_name', 'date', 'time']
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Log.objects.filter(student__classSH__id=self.kwargs['classSH_pk']).select_related('student')
+        if self.request.user.is_staff:
+            return Log.objects.filter(student__classSH__id=self.kwargs['classSH_pk']).select_related('student')
+        return Log.objects.filter(student__classSH__id=self.kwargs['classSH_pk'],
+                                  student__classSH__department_id=self.request.user.managers.department_id).select_related('student')
 
 
 class StudentLogViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
@@ -99,12 +114,13 @@ class StudentLogViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     filter_class = SimpleLogFilter
     pagination_class = LogPagination
     ordering_fields = ('date', 'time', 'mask', 'camera')
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Log.objects.filter(student_id=self.kwargs['student_pk'])
 
 
-class LogViewSet(ListModelMixin, GenericViewSet):
+class LogViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     queryset = Log.objects.all().select_related(
         'student', 'student__classSH', 'student__classSH__department')
     serializer_class = LogSerializer
@@ -116,6 +132,24 @@ class LogViewSet(ListModelMixin, GenericViewSet):
                        'student__last_name', 'date', 'time']
 
 
-class ManagerViewSet(CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
+class ManagerViewSet(ListModelMixin, RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     queryset = Manager.objects.all()
-    serializer_class = ManagerSerializer
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
+
+    def get_serializer_class(self):
+        if self.request.user.is_staff:
+            return ListManagerSerializer
+        return HiddenManagerSerializer
+
+    @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAuthenticated])
+    def me(self, request):
+        manager, _ = Manager.objects.get_or_create(user_id=request.user.id)
+        if request.method == 'GET':
+            serializer = ManagerSerializer(manager)
+            return Response(serializer.data)
+        elif request.method == 'PUT':
+            serializer = HiddenManagerSerializer(manager, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)

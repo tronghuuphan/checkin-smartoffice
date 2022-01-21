@@ -7,6 +7,7 @@ from .models import (
     Department,
     Manager,
 )
+from django.conf import settings
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -86,10 +87,43 @@ class SimpleClassLogSerializer(LogSerializer):
 
 
 class ManagerSerializer(serializers.ModelSerializer):
-    department_id = serializers.IntegerField()
-    user_id = serializers.IntegerField()
+    department_id = serializers.IntegerField(required=False)
+    user_id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Manager
         fields = ('id', 'user_id', 'phone',
-                  'birthday', 'department_id', 'image')
+                  'birthday', 'department_id', 'image',)
+
+
+class HiddenManagerSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Manager
+        fields = ('id', 'phone', 'user_id',  'birthday', 'image')
+
+
+class ListManagerSerializer(serializers.ModelSerializer):
+    department_id = serializers.IntegerField(required=False)
+    user_id = serializers.IntegerField(read_only=True)
+    first_name = serializers.CharField(
+        max_length=50, source='user.first_name', read_only=True)
+    last_name = serializers.CharField(
+        max_length=50, source='user.last_name', read_only=True)
+    email = serializers.EmailField(read_only=True, source='user.email')
+    date_joined = serializers.DateTimeField(read_only=True, source='user.date_joined')
+
+    class Meta:
+        model = Manager
+        fields = ('id',
+                  'user_id',
+                  'first_name',
+                  'last_name',
+                  'email',
+                  'phone',
+                  'birthday',
+                  'department_id',
+                  'date_joined',
+                  'image',
+                  )

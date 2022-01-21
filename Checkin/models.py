@@ -18,6 +18,7 @@ class Department(models.Model):
     def __str__(self):
         return self.name
 
+
 class ClassSH(models.Model):
     name = models.CharField(max_length=255)
     year = models.PositiveIntegerField(
@@ -33,7 +34,8 @@ class ClassSH(models.Model):
 
 
 class Student(models.Model):
-    SEX_CHOICES = [(0, "Not known"), (1, "Male"), (2, "Female"), (9, "Not applicable")]
+    SEX_CHOICES = [(0, "Not known"), (1, "Male"),
+                   (2, "Female"), (9, "Not applicable")]
 
     CCCD = models.CharField(primary_key=True, max_length=12)
     first_name = models.CharField(max_length=50)
@@ -67,8 +69,9 @@ class Log(models.Model):
 
 
 class Manager(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=26)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, unique=True, on_delete=models.CASCADE, related_name='managers')
+    phone = models.CharField(max_length=26, null=True)
     birthday = models.DateField(blank=True, null=True)
     department = models.ForeignKey(
         Department,
