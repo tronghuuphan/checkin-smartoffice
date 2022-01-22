@@ -47,7 +47,8 @@ class Student(models.Model):
         ClassSH, on_delete=models.SET_NULL, null=True, related_name="classes"
     )
     active_status = models.BooleanField(default=True)
-    image = models.CharField(max_length=255, null=True)
+   # image = models.CharField(max_length=255, null=True)
+    image = models.FileField(max_length=255)
 
     class Meta:
         ordering = ['classSH']

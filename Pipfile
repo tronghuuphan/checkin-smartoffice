@@ -13,6 +13,10 @@ django-filter = "*"
 drf-nested-routers = "*"
 djoser = "*"
 djangorestframework-simplejwt = "*"
+django-storages = "*"
+boto3 = "*"
+python-decouple = "*"
+certifi = "*"
 
 [dev-packages]
 black = "*"

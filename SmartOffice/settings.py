@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+import os
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,10 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-@p5jiv@k@l#-5u1v!2017a@k!2im%nms%q=)o40cy-i8+u5j=u"
+SECRET_KEY = config('SECRET_KEY') 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = []
 
@@ -89,10 +91,10 @@ WSGI_APPLICATION = "SmartOffice.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "CheckIn",
-        "HOST": "localhost",
-        "USER": "root",
-        "PASSWORD": "HuuPhan123@",
+        "NAME": config('DB_NAME'),
+        "HOST": config('DB_HOST'),
+        "USER": config('DB_USER'),
+        "PASSWORD": config('DB_PASSWORD'),
     }
 }
 
@@ -132,6 +134,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -161,3 +166,6 @@ DJOSER = {
         'user_delete':  ['rest_framework.permissions.IsAdminUser'],
     }
 }
+
+# AWS S3 configuration
+
