@@ -17,6 +17,8 @@ django-storages = "*"
 boto3 = "*"
 python-decouple = "*"
 certifi = "*"
+uwsgi = "*"
+django-cleanup = "*"
 
 [dev-packages]
 black = "*"

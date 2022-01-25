@@ -80,7 +80,7 @@ class Manager(models.Model):
         null=True,
         blank=True,
     )
-    image = models.CharField(max_length=255, null=True)
+    image = models.FileField(max_length=255, null=True)
 
     def __str__(self):
         return f"{self.user} - {self.phone}"
