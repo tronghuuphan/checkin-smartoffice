@@ -67,7 +67,6 @@ class CreateStudentSerializer(serializers.ModelSerializer):
             "classSH"
         )
 
-
 class SimpleLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = Log
@@ -107,6 +106,7 @@ class HiddenManagerSerializer(serializers.ModelSerializer):
 class ListManagerSerializer(serializers.ModelSerializer):
     department_id = serializers.IntegerField(required=False)
     user_id = serializers.IntegerField(read_only=True)
+    username = serializers.CharField(read_only=True, source='user.username')
     first_name = serializers.CharField(
         max_length=50, source='user.first_name', read_only=True)
     last_name = serializers.CharField(
@@ -118,6 +118,7 @@ class ListManagerSerializer(serializers.ModelSerializer):
         model = Manager
         fields = ('id',
                   'user_id',
+                  'username',
                   'first_name',
                   'last_name',
                   'email',

@@ -28,7 +28,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG')
 
-ALLOWED_HOSTS = ['18.140.1.138', 'localhost']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -169,4 +169,5 @@ DJOSER = {
 }
 
 # AWS S3 configuration
+
 
