@@ -53,11 +53,20 @@ class DepartmentViewSet(ModelViewSet):
 
 
 class ClassSHViewSet(ModelViewSet):
-    queryset = ClassSH.objects.all().select_related('department')
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_class = ClassSHFilter
     ordering_fields = ('name', 'year', 'location', 'department')
     permission_classes = [IsAdminOrReadOnly]
+
+    def get_queryset(self):
+        if (self.request.user.is_staff):
+            return ClassSH.objects.all().select_related('department')
+        elif self.request.user.is_authenticated:
+            if self.request.user.managers.department_id is not None:
+                return ClassSH.objects.filter(department_id=self.request.user.managers.department_id).select_related('department')
+            elif self.request.user.managers.department_id is None:
+                return ClassSH.objects.none()
+        return ClassSH.objects.all().select_related('department')
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -90,6 +99,16 @@ class DetailStudentViewSet(CreateModelMixin, RetrieveModelMixin, GenericViewSet)
         if self.request.method == 'POST':
             return CreateStudentSerializer
         return DetailStudentSerializer
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        allowed_classes_list = list(ClassSH.objects.filter(department_id=self.request.user.managers.department_id).values_list('id', flat=True))
+        student_class_id = int(serializer.initial_data['classSH'])
+        if student_class_id in allowed_classes_list:
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
 class ClassLogViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
@@ -144,7 +163,7 @@ class ManagerViewSet(ListModelMixin, RetrieveModelMixin, UpdateModelMixin, Gener
 
     @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAuthenticated])
     def me(self, request):
-        manager, _ = Manager.objects.get_or_create(user_id=request.user.id)
+        manager = Manager.objects.get(user_id=request.user.id)
         if request.method == 'GET':
             serializer = ManagerSerializer(manager)
             return Response(serializer.data)
@@ -153,3 +172,4 @@ class ManagerViewSet(ListModelMixin, RetrieveModelMixin, UpdateModelMixin, Gener
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+

@@ -2,7 +2,18 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.conf import settings
+from uuid import uuid4
+import os
 
+def path_and_rename(instance, filename):
+    extension = filename.split('.')[-1]
+    filename = '{}.{}'.format(uuid4().hex, extension)
+    return os.path.join('students', filename)
+
+def path_and_rename_manager(instance, filename):
+    extension = filename.split('.')[-1]
+    filename = '{}.{}'.format(uuid4().hex, extension)
+    return os.path.join('managers', filename)
 
 class Camera(models.Model):
     name = models.CharField(max_length=255)
@@ -40,15 +51,15 @@ class Student(models.Model):
     CCCD = models.CharField(primary_key=True, max_length=12)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    email = models.EmailField()
+    email = models.EmailField(blank=True)
     sex = models.IntegerField(choices=SEX_CHOICES, default=0)
     birthday = models.DateField(null=True, blank=True)
     classSH = models.ForeignKey(
         ClassSH, on_delete=models.SET_NULL, null=True, related_name="classes"
     )
     active_status = models.BooleanField(default=True)
-   # image = models.CharField(max_length=255, null=True)
-    image = models.FileField(max_length=255)
+    image = models.ImageField(max_length=255, upload_to=path_and_rename)
+    trained = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['classSH']
@@ -80,7 +91,7 @@ class Manager(models.Model):
         null=True,
         blank=True,
     )
-    image = models.FileField(max_length=255, null=True)
+    image = models.ImageField(max_length=255, null=True, upload_to=path_and_rename_manager)
 
     def __str__(self):
         return f"{self.user} - {self.phone}"
