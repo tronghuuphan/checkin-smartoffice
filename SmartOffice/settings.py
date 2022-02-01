@@ -28,7 +28,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG')
 
-ALLOWED_HOSTS = ['18.140.1.138', 'localhost']
+ALLOWED_HOSTS = ['api.bk-maker.com']
 
 
 # Application definition
@@ -170,3 +170,12 @@ DJOSER = {
 
 # AWS S3 configuration
 
+AWS_ACCESS_KEY_ID = 'AKIAQ57B5NVX2FCVMCZW'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'nckh-2022'
+AWS_S3_SIGNATURE_VERSION = 's3v4'
+AWS_S3_REGION_NAME = 'ap-southeast-1'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+AWS_S3_VERIFY = True
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
