@@ -59,6 +59,7 @@ class Student(models.Model):
     )
     active_status = models.BooleanField(default=True)
     image = models.ImageField(max_length=255, upload_to=path_and_rename)
+    trained = models.IntegerField(default=0, blank=True, null=True)
 
     class Meta:
         ordering = ['classSH']
